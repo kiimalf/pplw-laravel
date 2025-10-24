@@ -1,0 +1,245 @@
+/* Color Variables */
+:root {
+    --primary-blue: #1a4b8c;
+    --secondary-blue: #2264bf;
+    --light-blue: #e8f1ff;
+    --primary-yellow: #ffc107;
+    --secondary-yellow: #ffdb4d;
+    --dark: #333333;
+    --light: #ffffff;
+    --gray: #f5f5f5;
+}
+
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    margin: 0 auto;
+    max-width: 1200px;
+    background-color: var(--gray);
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* Header & Navigation */
+header {
+    background: var(--light);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar {
+    padding: 0.5rem 2rem;
+    height: auto;
+}
+
+.navbar-blue {
+    background: var(--primary-blue);
+}
+
+.navbar-orange {
+    background: var(--primary-yellow);
+}
+
+.navbar ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-blue ul {
+    justify-content: flex-start;
+}
+
+.navbar-orange ul {
+    justify-content: flex-end;
+}
+
+.navbar a {
+    color: var(--light);
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    display: block;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.navbar-blue a:hover {
+    background: var(--secondary-blue);
+}
+
+.navbar-orange a:hover {
+    background: var(--secondary-yellow);
+    color: var(--dark);
+}
+
+/* Logo */
+.logo_rshp {
+    height: 80px;
+    display: block;
+    margin: 1rem auto;
+    transition: transform 0.3s ease;
+}
+
+.logo_rshp:hover {
+    transform: scale(1.05);
+}
+
+/* Main Content */
+.main {
+    background: var(--light);
+    padding: 2rem;
+    margin: 2rem auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Typography */
+h1 {
+    color: var(--primary-blue);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    text-align: center;
+}
+
+h3 {
+    color: var(--primary-blue);
+    margin: 2rem 0 1rem;
+    font-size: 1.5rem;
+    border-bottom: 3px solid var(--primary-yellow);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    margin: 0.5rem 0;
+}
+
+.btn-yellow {
+    background: var(--primary-yellow);
+    color: var(--dark);
+}
+
+.btn-blue {
+    background: var(--primary-blue);
+    color: var(--light);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Tables */
+table {
+    width: 100%;
+    margin: 1.5rem 0;
+    border-collapse: collapse;
+    background: var(--light);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border: 1px solid #e0e0e0;
+}
+
+th {
+    background: var(--light-blue);
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* Footer */
+footer {
+    background: var(--primary-blue);
+    color: var(--light);
+    padding: 2rem;
+    margin-top: 3rem;
+    border-radius: 12px 12px 0 0;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.footer-copyright {
+    opacity: 0.9;
+}
+
+.footer-nama {
+    line-height: 1.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 0 1rem;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar ul {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .navbar a {
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .main {
+        padding: 1rem;
+        margin: 1rem;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+}
