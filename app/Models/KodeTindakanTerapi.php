@@ -9,6 +9,7 @@ class KodeTindakanTerapi extends Model
     protected $table = 'kode_tindakan_terapi';
     protected $primaryKey = 'idkode_tindakan_terapi';
     protected $fillable = ['kode', 'deskripsi_tindakan_terapi', 'idkategori', 'idkategori_klinis'];
+    public $timestamps = false;
 
     public function kategori()
     {
@@ -19,8 +20,9 @@ class KodeTindakanTerapi extends Model
     {
         return $this->belongsTo(KategoriKlinis::class, 'idkategori_klinis', 'idkategori_klinis');
     }
-    public function rekamMedis()
+    
+    public function detailRekamMedis()
     {
-        return $this->belongsToMany(RekamMedis::class, 'detail_rekam_medis', 'idkode_tindakan_terapi', 'idrekam_medis')->withPivot('detail');
+        return $this->hasMany(DetailRekamMedis::class, 'idkode_tindakan_terapi', 'idkode_tindakan_terapi');
     }
 }

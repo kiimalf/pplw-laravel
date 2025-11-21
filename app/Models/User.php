@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+    public $timestamps = false;
     protected function casts(): array
     {
         return [
@@ -32,6 +33,10 @@ class User extends Authenticatable
     public function pemilik()
     {
         return $this->hasOne(Pemilik::class, 'iduser', 'iduser');
+    }
+    public function roleUser()
+    {
+        return $this->hasMany(RoleUser::class, 'iduser', 'iduser');
     }
     public function roles()
     {

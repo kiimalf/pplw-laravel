@@ -11,7 +11,7 @@ class RekamMedisController extends Controller
 {
     public function index()
     {
-        $rekamMedis = RekamMedis::all();
-        return view('admin.rekam-medis.index', compact('rekamMedis'));
+        $rekamMedisS = RekamMedis::all();
+        return view('admin.rekam-medis.index', compact('rekamMedisS'));
     }
 }

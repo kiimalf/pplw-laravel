@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\KodeTindakanTerapi;
+use App\Models\Kategori;
+use App\Models\KategoriKlinis;
 
 class KodeTindakanTerapiController extends Controller
 {
@@ -14,5 +16,69 @@ class KodeTindakanTerapiController extends Controller
         $kodeTindakanTerapi = KodeTindakanTerapi::all();
         return view('admin.kode-tindakan-terapi.index', compact('kodeTindakanTerapi'));
     }
-    
+    public function create()
+    {
+        $kategori = Kategori::all();
+        $kategoriKlinis = KategoriKlinis::all();
+        return view('admin.kode-tindakan-terapi.create', compact('kategori', 'kategoriKlinis'));
+    }
+    public function edit($idkode_tindakan_terapi)
+    {
+        $kodeTindakanTerapi = KodeTindakanTerapi::findOrFail($idkode_tindakan_terapi);
+        $kategori = Kategori::whereNot('idkategori', $kodeTindakanTerapi->idkategori)->get();
+        $kategoriKlinis = KategoriKlinis::whereNot('idkategori_klinis', $kodeTindakanTerapi->idkategori_klinis)->get();
+
+        return view('admin.kode-tindakan-terapi.edit', compact('kodeTindakanTerapi', 'kategori', 'kategoriKlinis'));
+    }
+
+    public function store(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'kode' => 'required|max:5|unique:kode_tindakan_terapi,kode',
+            'idkategori' => 'required',
+            'idkategori_klinis' => 'required',
+            'deskripsi_tindakan_terapi' => 'required|max:1000',
+        ]);
+
+        // Buat user baru
+        KodeTindakanTerapi::create([
+            'kode' => $validated['kode'],
+            'idkategori' => $validated['idkategori'],
+            'idkategori_klinis' => $validated['idkategori_klinis'],
+            'deskripsi_tindakan_terapi' => $validated['deskripsi_tindakan_terapi'],
+        ]);
+
+        return redirect()->route('admin.tindakan-terapi.index')->with('success', 'Kode Tindakan Terapi berhasil ditambahkan.');
+    }
+    public function update(Request $request, $idkode_tindakan_terapi)
+    {
+        // Temukan user yang akan diupdate
+        $kodeTindakanTerapi = KodeTindakanTerapi::findOrFail($idkode_tindakan_terapi);
+
+        // Validasi input
+        $validated = $request->validate([
+            'kode' => 'nullable|max:5|unique:kode_tindakan_terapi,kode',
+            'idkategori' => 'nullable',
+            'idkategori_klinis' => 'nullable',
+            'deskripsi_tindakan_terapi' => 'nullable|max:1000',
+        ]);
+
+        // Update data user
+        $kodeTindakanTerapi->update([
+            'kode' => $validated['kode'] ?? $kodeTindakanTerapi->kode,
+            'idkategori' => $validated['idkategori'] ?? $kodeTindakanTerapi->idkategori,
+            'idkategori_klinis' => $validated['idkategori_klinis'] ?? $kodeTindakanTerapi->idkategori_klinis,
+            'deskripsi_tindakan_terapi' => $validated['deskripsi_tindakan_terapi'] ?? $kodeTindakanTerapi->deskripsi_tindakan_terapi,
+        ]);
+
+        return redirect()->route('admin.tindakan-terapi.index')->with('success', 'Kode Tindakan Terapi berhasil diperbarui.');
+    }
+    public function delete($idkode_tindakan_terapi)
+    {
+        $kodeTindakanTerapi = KodeTindakanTerapi::findOrFail($idkode_tindakan_terapi);
+        $kodeTindakanTerapi->delete();
+
+        return redirect()->route('admin.tindakan-terapi.index')->with('success', 'Kode Tindakan Terapi berhasil dihapus.');
+    }
 }
