@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\User;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -25,10 +26,20 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $role_user = $request->User()->roleUser()->where('status', '1')->first();
+        $role = $role_user->role->nama_role;
+
+
+        return match ($role) {
+            'Administrator' => redirect()->route('admin.dashboard'),
+            'Dokter'=> redirect()->route('dokter.dashboard'),
+            'Perawat'=> redirect()->route('perawat.dashboard'),
+            'Resepsionis'   => redirect()->route('resepsionis.dashboard'),
+            'Pemilik'       => redirect()->route('pemilik.dashboard'),
+            default         => redirect()->route('dashboard'),
+        };
     }
 
     /**

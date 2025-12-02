@@ -9,9 +9,10 @@ class Role extends Model
     protected $table = 'role';
     protected $primaryKey = 'idrole';
     protected $fillable = ['nama_role'];
+    public $timestamps = false;
 
-    public function users()
+    public function roleUser()
     {
-        return $this->belongsToMany(user::class, 'role_user', 'idrole', 'iduser')->using(RoleUser::class)->withPivot('status');
+        return $this->hasMany(RoleUser::class, 'idrole', 'idrole');
     }
 }

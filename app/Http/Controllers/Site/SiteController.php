@@ -17,6 +17,11 @@ class SiteController extends Controller
             return 'Koneksi ke database gagal: ' . $e->getMessage();
         }
     }
+
+    public function dashboard()
+    {
+        return view('dashboard');
+    }
     public function home()
     {
         return view('site.home');
@@ -35,5 +40,10 @@ class SiteController extends Controller
     public function struktur()
     {
         return view('site.strukturOrganisasi');
+    }
+
+    public function login()
+    {
+        return view('auth.login');
     }
 }
