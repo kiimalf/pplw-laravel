@@ -15,6 +15,22 @@ class isPerawat
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        $role_user = $request->user()
+            ->roleUser()
+            ->where('status', 1)
+            ->with('role')
+            ->first();
+
+        if (!$role_user || !$role_user->role) {
+            return back()->with('error', 'Role tidak ditemukan atau tidak aktif.');
+        }
+
+        $role = $role_user->role->nama_role;
+
+        if ($role === 'Perawat') {
+            return $next($request);
+        }
+
+        return back()->with('error', 'Anda tidak memiliki akses ke halaman ini.');
     }
 }

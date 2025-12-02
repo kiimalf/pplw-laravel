@@ -6,7 +6,7 @@
     </div>
     <div class="mb-4 flex justify-end items-center gap-4">
 
-        <a href=""
+        <a href=" {{ route('admin.rekam-medis.create') }}"
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             + Tambah Rekam
         </a>
@@ -46,12 +46,12 @@
                         <td class="px-6 py-3">
                             <div class="flex gap-2 justify-center">
 
-                                <a href=""
+                                <a href="{{ route('admin.rekam-medis.detail', $rekamMedis->idrekam_medis) }}"
                                     class="bg-orange-500 text-white px-4 py-1 rounded-lg hover:bg-orange-600 transition">
-                                    Edit
+                                    detail
                                 </a>
 
-                                <form action=""
+                                <form action="{{ route('admin.rekam-medis.delete', $rekamMedis->idrekam_medis) }}"
                                     method="POST"
                                     onsubmit="return confirm('Yakin ingin menghapus role ini?')">
 

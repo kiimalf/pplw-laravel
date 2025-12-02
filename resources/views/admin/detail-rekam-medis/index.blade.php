@@ -6,7 +6,7 @@
     </div>
     <div class="mb-4 flex justify-end items-center gap-4">
 
-        <a href=""
+        <a href="{{ route('admin.detail-rekam-medis.create') }}"
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             + Tambah Detail Rekam Medis
         </a>
@@ -19,7 +19,7 @@
                 <tr class="text-center">
                     <th class="px-6 py-4 text-xs font-bold uppercase w-10 tracking-wider">#</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">ID Rekam Medis</th>
-                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Kode Tindakan Terapi</th>
+                    
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Detail</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase w-10 tracking-wider">Aksi</th>
                 </tr>

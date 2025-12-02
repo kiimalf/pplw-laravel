@@ -6,7 +6,7 @@
     </div>
     <div class="mb-4 flex justify-end items-center gap-4">
 
-        <a href=""
+        <a href="{{ route('admin.pemilik.create') }}"
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             + Tambah Pemilik
         </a>
@@ -19,6 +19,7 @@
                 <tr class="text-center">
                     <th class="px-6 py-4 text-xs font-bold uppercase w-10 tracking-wider">#</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Nama Pemilik</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Email</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">No WA</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Alamat</th>
                     <th class="px-6 py-4 text-xs font-bold uppercase w-10 tracking-wider">Aksi</th>
@@ -32,18 +33,19 @@
 
                         <td class="px-6 py-3">{{ $loop->iteration }}</td>
                         <td class="px-6 py-3">{{ $pemilik->user->nama }}</td>
+                        <td class="px-6 py-3">{{ $pemilik->user->email }}</td>
                         <td class="px-6 py-3">{{ $pemilik->no_wa}}</td>
                         <td class="px-6 py-3">{{ $pemilik->alamat }}</td>
 
                         <td class="px-6 py-3">
                             <div class="flex gap-2 justify-center">
 
-                                <a href=""
+                                <a href="{{ route('admin.pemilik.edit', $pemilik->idpemilik) }}"
                                     class="bg-orange-500 text-white px-4 py-1 rounded-lg hover:bg-orange-600 transition">
                                     Edit
                                 </a>
 
-                                <form action=""
+                                <form action="{{ route('admin.pemilik.delete', $pemilik->idpemilik) }}"
                                     method="POST"
                                     onsubmit="return confirm('Yakin ingin menghapus role ini?')">
 

@@ -68,10 +68,6 @@
                         Data Rekam Medis
                     </x-nav-link>
 
-                    <x-nav-link :href="route('admin.detail-rekam-medis.index')" :active="request()->routeIs('admin.detail-rekam-medis.index')">
-                        Data Detail Rekam Medis
-                    </x-nav-link>
-
                     <x-nav-link :href="route('admin.kategori.index')" :active="request()->routeIs('admin.kategori.index')">
                         Data Kategori
                     </x-nav-link>
@@ -97,7 +93,147 @@
             <x-nav-link :href="route('resepsionis.dashboard')" :active="request()->routeIs('resepsionis.dashboard')">
                 {{ __('Dashboard') }}
             </x-nav-link>
+            <div x-data="{ open: false }">
 
+                {{-- Tombol dropdown --}}
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-1 py-2
+                        text-sm font-medium  {{-- ukuran sama dengan nav-link --}}
+                        text-gray-700 dark:text-gray-200
+                        ">
+                    <span>Data Master</span>
+
+                    <svg :class="{'rotate-180': open}" 
+                        class="w-4 h-4 transition-transform"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {{-- Isi dropdown --}}
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('resepsionis.pemilik.index')" :active="request()->routeIs('resepsionis.pemilik.index')">
+                        Data Pemilik
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('resepsionis.pet.index')" :active="request()->routeIs('resepsionis.pet.index')">
+                        Data Pet
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('resepsionis.temu-dokter.index')" :active="request()->routeIs('resepsionis.temu-dokter.index')">
+                        Data Temu Dokter
+                    </x-nav-link>
+                </div>
+
+            </div>
+        
+        @elseif ($role == 'Dokter')
+            <x-nav-link :href="route('dokter.dashboard')" :active="request()->routeIs('dokter.dashboard')">
+                {{ __('Dashboard') }}
+            </x-nav-link>
+            <div x-data="{ open: false }">
+
+                {{-- Tombol dropdown --}}
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-1 py-2
+                        text-sm font-medium  {{-- ukuran sama dengan nav-link --}}
+                        text-gray-700 dark:text-gray-200
+                        ">
+                    <span>Data Master</span>
+
+                    <svg :class="{'rotate-180': open}" 
+                        class="w-4 h-4 transition-transform"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {{-- Isi dropdown --}}
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('dokter.pet.index')" :active="request()->routeIs('dokter.pet.index')">
+                        Data Pasien
+                    </x-nav-link>
+                    <x-nav-link :href="route('dokter.temu-dokter.index')" :active="request()->routeIs('dokter.temu-dokter.index')">
+                        Data Temu Dokter
+                    </x-nav-link>
+                    <x-nav-link :href="route('dokter.rekam-medis.index')" :active="request()->routeIs('dokter.rekam-medis.index')">
+                        Data Rekam Medis
+                    </x-nav-link>
+                </div>
+            </div>
+        
+        @elseif ($role == 'Perawat')
+            <x-nav-link :href="route('perawat.dashboard')" :active="request()->routeIs('perawat.dashboard')">
+                {{ __('Dashboard') }}
+            </x-nav-link>
+            <div x-data="{ open: false }">
+
+                {{-- Tombol dropdown --}}
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-1 py-2
+                        text-sm font-medium  {{-- ukuran sama dengan nav-link --}}
+                        text-gray-700 dark:text-gray-200
+                        ">
+                    <span>Data Master</span>
+
+                    <svg :class="{'rotate-180': open}" 
+                        class="w-4 h-4 transition-transform"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {{-- Isi dropdown --}}
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('perawat.pet.index')" :active="request()->routeIs('perawat.pet.index')">
+                        Data Pet
+                    </x-nav-link>
+                </div>
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('perawat.rekam-medis.index')" :active="request()->routeIs('perawat.rekam-medis.index')">
+                        Data Rekam Medis
+                    </x-nav-link>
+                </div>
+            </div>
+
+        @elseif ($role == 'Pemilik')
+            <x-nav-link :href="route('pemilik.dashboard')" :active="request()->routeIs('pemilik.dashboard')">
+                {{ __('Dashboard') }}
+            </x-nav-link>
+            <div x-data="{ open: false }">
+
+                {{-- Tombol dropdown --}}
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-1 py-2
+                        text-sm font-medium  {{-- ukuran sama dengan nav-link --}}
+                        text-gray-700 dark:text-gray-200
+                        ">
+                    <span>Data Master</span>
+
+                    <svg :class="{'rotate-180': open}" 
+                        class="w-4 h-4 transition-transform"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {{-- Isi dropdown --}}
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('pemilik.pet.index')" :active="request()->routeIs('pemilik.pet.index')">
+                        Data Pet
+                    </x-nav-link>
+                </div>
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('pemilik.temu-dokter.index')" :active="request()->routeIs('pemilik.temu-dokter.index')">
+                        Data Temu Dokter
+                    </x-nav-link>
+                </div>
+                <div x-show="open" x-collapse class="ml-4 mt-1 space-y-1 flex flex-col">
+                    <x-nav-link :href="route('pemilik.rekam-medis.index')" :active="request()->routeIs('pemilik.rekam-medis.index')">
+                        Data Rekam Medis
+                    </x-nav-link>
+                </div>
+            </div>
         {{-- MENU GUEST / USER BIASA --}}
         @else
             <x-nav-link :href="route('home')" :active="request()->routeIs('home')">

@@ -20,7 +20,7 @@
     @include('layouts.sidebar')
 
     {{-- CONTENT AREA --}}
-    <main class="flex-1 ml-64 p-6">
+    <main class="flex-1 ml-64 p-6 ">
         {{ $slot }}
     </main>
 
