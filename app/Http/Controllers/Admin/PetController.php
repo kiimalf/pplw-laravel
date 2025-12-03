@@ -11,6 +11,28 @@ use App\Models\RasHewan;
 
 class PetController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'store')
+    {
+        $rules = [
+            'nama_pet' => 'required',
+            'tanggal_lahir' => 'required',
+            'warna_tanda' => 'required',
+            'jenis_kelamin' => 'required',
+            'idpemilik' => 'required',
+            'idras_hewan' => 'required'
+        ];
+
+        if ($mode === 'update') {
+            foreach ($rules as &$rule) $rule = 'nullable';
+        }
+
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $pets = Pet::all();
@@ -33,20 +55,13 @@ class PetController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'nama_pet' => 'required',
-            'tanggal_lahir' => 'required',
-            'warna_tanda' => 'required',
-            'jenis_kelamin' => 'required',
-            'idpemilik' => 'required',
-            'idras_hewan' => 'required'
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         Pet::create([
-            'nama' => $validated['nama_pet'],
+            'nama' => $this->FormatInput($validated['nama_pet']),
             'tanggal_lahir' => $validated['tanggal_lahir'],
-            'warna_tanda' => $validated['warna_tanda'],
+            'warna_tanda' => $this->FormatInput($validated['warna_tanda']),
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'idpemilik' => $validated['idpemilik'],
             'idras_hewan' => $validated['idras_hewan'],
@@ -60,19 +75,13 @@ class PetController extends Controller
         $pet = Pet::findOrFail($idpet);
 
         // Validasi input
-        $validated = $request->validate([
-            'nama_pet' => 'nullable',
-            'tanggal_lahir' => 'nullable',
-            'warna_tanda' => 'nullable',
-            'jenis_kelamin' => 'nullable',
-            'idras_hewan' => 'nullable',
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data user
         $pet->update([
-            'nama' => $validated['nama_pet'] ?? $pet->nama,
+            'nama' => $this->FormatInput($validated['nama_pet']) ?? $pet->nama,
             'tanggal_lahir' => $validated['tanggal_lahir'] ?? $pet->tanggal_lahir,
-            'warna_tanda' => $validated['warna_tanda'] ?? $pet->warna_tanda,
+            'warna_tanda' => $this->FormatInput($validated['warna_tanda']) ?? $pet->warna_tanda,
             'jenis_kelamin' => $validated['jenis_kelamin'] ?? $pet->jenis_kelamin,
             'idras_hewan' => $validated['idras_hewan'] ?? $pet->idras_hewan,
         ]);

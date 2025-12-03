@@ -11,6 +11,20 @@ use App\Models\RekamMedis;
 
 class DetailRekamMedisController extends Controller
 {
+    protected function validateData(Request $request)
+    {
+        $rules = [
+            'idrekam_medis' => 'required',
+            'kodeTindakan' => 'required',
+            'detail' => 'nullable'
+        ];
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index($idrekam_medis)
     {
         $rekamMedis = RekamMedis::findOrFail($idrekam_medis);
@@ -22,17 +36,13 @@ class DetailRekamMedisController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'idrekam_medis' => 'required',
-            'kodeTindakan' => 'required',
-            'detail' => 'required'
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         DetailRekamMedis::create([
             'idrekam_medis' => $validated['idrekam_medis'],
             'idkode_tindakan_terapi' => $validated['kodeTindakan'],
-            'detail' => $validated['detail'] ?? '-',
+            'detail' => $this->FormatInput($validated['detail']) ?? '-',
         ]);
 
         return redirect()->route('admin.rekam-medis.detail', $validated['idrekam_medis'])->with('success', 'Detail Rekam Medis berhasil ditambahkan.');

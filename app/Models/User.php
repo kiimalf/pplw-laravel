@@ -40,7 +40,7 @@ class User extends Authenticatable
     }
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_user', 'iduser', 'idrole')->using(RoleUser::class)->withPivot('status');
+        return $this->belongsToMany(Role::class, 'role', 'iduser', 'idrole')->withPivot('status');
     }
 
 

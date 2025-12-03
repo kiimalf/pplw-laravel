@@ -9,6 +9,24 @@ use App\Models\KategoriKlinis;
 
 class KategoriKlinisController extends Controller
 {
+    protected function validateData(Request $request, $type = 'store')
+    {
+        $uniqueNama ='unique:kategori_klinis,nama_kategori_klinis';
+        $rules = [
+            'nama_kategori_klinis' => "required|$uniqueNama",
+        ];
+        if ($type === 'update') {
+            $rules = [
+                'nama_kategori_klinis' => "nullable|$uniqueNama",
+            ];
+        }
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $kategoriKlinisS = KategoriKlinis::all();
@@ -27,13 +45,11 @@ class KategoriKlinisController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'nama_kategori_klinis' => 'required'
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         KategoriKlinis::create([
-            'nama_kategori_klinis' => $validated['nama_kategori_klinis'],
+            'nama_kategori_klinis' => $this->FormatInput($validated['nama_kategori_klinis']),
         ]);
 
         return redirect()->route('admin.kategori-klinis.index')->with('success', 'Kategori Klinis berhasil ditambahkan.');
@@ -44,13 +60,11 @@ class KategoriKlinisController extends Controller
         $kategoriKlinis = KategoriKlinis::findOrFail($idkategori_klinis);
 
         // Validasi input
-        $validated = $request->validate([
-            'nama_kategori_klinis' => 'nullable|string|max:255',
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data user
         $kategoriKlinis->update([
-            'nama_kategori_klinis' => $validated['nama_kategori_klinis'] ?? $kategoriKlinis->nama_kategori_klinis,
+            'nama_kategori_klinis' => $this->FormatInput($validated['nama_kategori_klinis']) ?? $kategoriKlinis->nama_kategori_klinis,
         ]);
 
         return redirect()->route('admin.kategori-klinis.index')->with('success', 'Kategori Klinis berhasil diperbarui.');

@@ -11,6 +11,27 @@ use App\Models\Pet;
 
 class TemuDokterController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'create')
+    {
+        $uniqueTemuDokter = 'unique:temu_dokter,no_urut';
+        $rules = [
+            'no_urut' => "required|$uniqueTemuDokter",
+            'idpet' => 'required',
+            'idrole_user' => 'required'
+        ];
+        if ($mode === 'update') {
+            $rules = [
+                'no_urut' => 'nullable',
+                'idpet' => 'nullable',
+                'idrole_user' => 'nullable'
+            ];
+        }
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
     public function index()
     {
         $temuDokters = TemuDokter::all();
@@ -32,16 +53,12 @@ class TemuDokterController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'no_urut' => 'required',
-            'idpet' => 'required',
-            'idrole_user' => 'required',
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         TemuDokter::create([
             'no_urut' => $validated['no_urut'],
-            'status' => '1',
+            'status' => '0',
             'idpet' => $validated['idpet'],
             'idrole_user' => $validated['idrole_user'],
             'waktu_daftar' => now(),
@@ -55,10 +72,7 @@ class TemuDokterController extends Controller
         $temuDokter = TemuDokter::findOrFail($idreservasi_dokter);
 
         // Validasi input
-        $validated = $request->validate([
-            'idrole_user' => 'nullable',
-            'status' => 'nullable',
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data user
         $temuDokter->update([
@@ -75,4 +89,5 @@ class TemuDokterController extends Controller
 
         return redirect()->route('admin.temu-dokter.index')->with('success', 'Role berhasil dihapus.');
     }
+    
 }

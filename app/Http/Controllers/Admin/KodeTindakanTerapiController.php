@@ -11,6 +11,30 @@ use App\Models\KategoriKlinis;
 
 class KodeTindakanTerapiController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'create')
+    {
+        $uniqueKode ='unique:kode_tindakan_terapi,kode';
+        $rules = [
+            'kode' => "required|$uniqueKode",
+            'idkategori' => 'required',
+            'idkategori_klinis' => 'required',
+            'deskripsi_tindakan_terapi' => 'required',
+        ];
+        if ($mode === 'update') {
+            $rules = [
+                'kode' => "nullable|$uniqueKode",
+                'idkategori' => 'nullable',
+                'idkategori_klinis' => 'nullable',
+                'deskripsi_tindakan_terapi' => 'nullable',
+            ];
+        }
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $kodeTindakanTerapi = KodeTindakanTerapi::all();
@@ -34,12 +58,7 @@ class KodeTindakanTerapiController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'kode' => 'required|max:5|unique:kode_tindakan_terapi,kode',
-            'idkategori' => 'required',
-            'idkategori_klinis' => 'required',
-            'deskripsi_tindakan_terapi' => 'required|max:1000',
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         KodeTindakanTerapi::create([
@@ -57,12 +76,7 @@ class KodeTindakanTerapiController extends Controller
         $kodeTindakanTerapi = KodeTindakanTerapi::findOrFail($idkode_tindakan_terapi);
 
         // Validasi input
-        $validated = $request->validate([
-            'kode' => 'nullable|max:5|unique:kode_tindakan_terapi,kode',
-            'idkategori' => 'nullable',
-            'idkategori_klinis' => 'nullable',
-            'deskripsi_tindakan_terapi' => 'nullable|max:1000',
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data user
         $kodeTindakanTerapi->update([

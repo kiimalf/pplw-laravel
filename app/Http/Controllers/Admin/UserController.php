@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::paginate(10);
+        $users = User::all();
 
         return view('admin.user.index', compact('users'));
     }
@@ -27,18 +27,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:user,email',
-            'password' => 'required|string|min:3',
-        ]);
-        // Buat user baru
-        User::create([
-            'nama' => $validated['nama'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
+        $validated = $this->validateUser($request);
+
+        $this->createUser($validated);
 
         return redirect()->route('admin.user.index')->with('success', 'User berhasil ditambahkan.');
     }
@@ -76,4 +67,36 @@ class UserController extends Controller
 
         return redirect()->route('admin.user.index')->with('success', 'User berhasil dihapus.');
     }
+
+
+    public function validateUser(request $request, $iduser = null)
+    {
+        $uniqueEmail = 'unique:user,email';
+
+        if ($iduser) {
+            $uniqueEmail .= ',' . $iduser . ',iduser';
+        }
+
+        return $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => "required|string|email|max:255|$uniqueEmail",
+            'password' => $iduser ? 'nullable|string|min:3' : 'required|string|min:3',
+        ]);
+    }
+
+    private function createUser($validated)
+    {
+        return User::create([
+            'nama' => $this->formatNama($validated['nama']),
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
+    }
+
+    private function formatNama($nama)
+    {
+        return ucwords(strtolower($nama));
+    }
+
+
 }

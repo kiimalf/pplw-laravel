@@ -10,6 +10,30 @@ use App\Models\User;
 
 class PemilikController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'create')
+    {
+        $uniqueEmail ='unique:User,email';
+        $rules = [
+            'nama' => 'required|string',
+            'email' => "required|email|$uniqueEmail",
+            'no_wa' => 'required|string',
+            'alamat' => 'required|string',
+        ];
+        if ($mode === 'update') {
+            $rules = [
+                'nama' => 'nullable|string',
+                'email' => "nullable|email|$uniqueEmail",
+                'no_wa' => 'nullable|string',
+                'alamat' => 'nullable|string',
+            ];
+        }
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $pemiliks = Pemilik::all();
@@ -30,16 +54,11 @@ class PemilikController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'nama' => 'required',
-            'email' => 'required|unique:User,email',
-            'no_wa' => 'required',
-            'alamat' => 'required',
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         User::create([
-            'nama' => $validated['nama'],
+            'nama' => $this->FormatInput($validated['alamat']),
             'email' => $validated['email'],
             'password' => bcrypt('123456'), // Set password default
         ]);
@@ -47,7 +66,7 @@ class PemilikController extends Controller
         Pemilik::create([
             'iduser' => User::where('email', $validated['email'])->first()->iduser,
             'no_wa' => $validated['no_wa'],
-            'alamat' => $validated['alamat'],
+            'alamat' => $this->FormatInput($validated['alamat']),
         ]);
 
         return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik berhasil ditambahkan.');
@@ -60,23 +79,18 @@ class PemilikController extends Controller
         $user = User::findOrFail($pemilik->iduser);
 
         // Validasi input
-        $validated = $request->validate([
-            'nama' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:User,email,'.$user->iduser.',iduser',
-            'no_wa' => 'nullable|string|max:20',
-            'alamat' => 'nullable|string|max:255',
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data user
         $user->update([
-            'nama' => $validated['nama'] ?? $user->nama,
+            'nama' => $this->FormatInput($validated['nama']) ?? $user->nama,
             'email' => $validated['email'] ?? $user->email,
         ]);
 
         // Update data pemilik
         $pemilik->update([
             'no_wa' => $validated['no_wa'] ?? $pemilik->no_wa,
-            'alamat' => $validated['alamat'] ?? $pemilik->alamat,
+            'alamat' => $this->FormatInput($validated['alamat']) ?? $pemilik->alamat,
         ]);
 
         return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik berhasil diperbarui.');
