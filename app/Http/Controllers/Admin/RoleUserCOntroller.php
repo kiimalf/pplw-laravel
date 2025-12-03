@@ -11,61 +11,80 @@ use App\Models\Role;
 
 class RoleUserCOntroller extends Controller
 {
+    protected function validateData(Request $request, $mode = 'create')
+    {
+        $rules = [
+            'iduser' => 'required',
+            'idrole' => 'required',
+        ];
+        if ($mode === 'update') {
+            $rules = [
+                'status' => 'nullable'
+            ];
+        }
+        return $request->validate($rules);
+    }
+
     public function index()
     {
-        $roleuser = RoleUser::with('user', 'role')->get()->groupBy('iduser'); // mengelompokkan per user
-        return view('admin.role-user.index', compact ('roleuser'));
+        $users = User::with('roleUser.role')->get();
+        return view('admin.role-user.index', compact('users'));
     }
     public function create()
     {
         return view('admin.role-user.create');
     }
-    public function edit($idrole_user)
+    public function edit($iduser)
     {
-        $roleuser = RoleUser::findOrFail($idrole_user);
-        return view('admin.role-user.edit', compact('roleuser'));
+        $user = User::with(['roleUser.role'])->findOrFail($iduser);
+        $role = Role::all();
+        return view('admin.role-user.edit', compact('user', 'role'));
     }
 
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'iduser' => 'required',
-            'idrole' => 'required',
-            'status' => 'nullable'
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
-        Role::create([
+        RoleUser::create([
             'iduser' => $validated['iduser'],
             'idrole' => $validated['idrole'],
-            'status' => $validated['status'] ?? '0',
+            'status' => '0',
         ]);
 
-        return redirect()->route('admin.role-user.index')->with('success', 'Role User berhasil ditambahkan.');
+        return redirect()->route('admin.role-user.edit', $validated['iduser'])->with('success', 'Role User berhasil ditambahkan.');
     }
-    public function update(Request $request, $idrole)
+    public function updateStatus(Request $request, $idrole_user)
     {
         // Temukan user yang akan diupdate
-        $role = Role::findOrFail($idrole);
+        $roleUser = RoleUser::findOrFail($idrole_user);
 
-        // Validasi input
-        $validated = $request->validate([
-            'nama_role' => 'nullable|string|max:255',
-        ]);
+        $status = $roleUser->status;
 
-        // Update data user
-        $role->update([
-            'nama_role' => $validated['nama_role'] ?? $role->nama_role,
-        ]);
+        if ($status == '0')
+        {
+            $roleUser->update([
+                'status' => '1',
+            ]);
+        }
+        else
+        {
+            $roleUser->update([
+                'status' => '0',
+            ]);
+        }
 
-        return redirect()->route('admin.role-user.index')->with('success', 'Role User berhasil diperbarui.');
+        return redirect()->route('admin.role-user.edit', $roleUser->user->iduser)->with('success', 'Role User berhasil diperbarui.');
     }
-    public function delete($idrole)
+    public function delete($idrole_user)
     {
-        $role = Role::findOrFail($idrole);
-        $role->delete();
+        $roleUser = RoleUser::findOrFail($idrole_user);
+        $roleUser->delete();
 
-        return redirect()->route('admin.role-user.index')->with('success', 'Role User berhasil dihapus.');
+        return redirect()->route('admin.role-user.edit', $roleUser->user->iduser)->with('success', 'Role User berhasil dihapus.');
     }
+
+
+
 }

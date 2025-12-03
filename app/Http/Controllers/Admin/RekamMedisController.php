@@ -12,6 +12,33 @@ use App\Models\RoleUser;
 
 class RekamMedisController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'create')
+    {
+        $uniqueRekamMedis = 'unique:rekam_medis,idreservasi_dokter';
+        $rules = [
+            'idreservasi_dokter' => "required|$uniqueRekamMedis",
+            'anamnesa' => 'required',
+            'diagnosa' => 'required',
+            'temuan_klinis' => 'required',
+            'dokter_pemeriksa' => 'required'
+        ];
+        if ($mode === 'update') {
+            $rules = [
+                'idreservasi_dokter' => 'nullable',
+                'idpet' => 'nullable',
+                'anamnesa' => 'nullable',
+                'diagnosa' => 'nullable',
+                'temuan_klinis' => 'nullable',
+                'dokter_pemeriksa' => 'nullable'
+            ];
+        }
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $rekamMedisS = RekamMedis::all();
@@ -37,21 +64,16 @@ class RekamMedisController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'idreservasi_dokter' => 'required',
-            'anamnesa' => 'required',
-            'diagnosa' => 'required',
-            'temuan_klinis' => 'required',
-            'dokter_pemeriksa' => 'required'
-        ]);
+        $validated = $this->validateData($request);
+
         $pet = TemuDokter::findOrFail($validated['idreservasi_dokter'])->idpet;
         // Buat user baru
         RekamMedis::create([
             'idreservasi_dokter' => $validated['idreservasi_dokter'],
             'idpet' => $pet,
-            'anamnesa' => $validated['anamnesa'],
-            'diagnosa' => $validated['diagnosa'],
-            'temuan_klinis' => $validated['temuan_klinis'],
+            'anamnesa' => $this->FormatInput($validated['anamnesa']),
+            'diagnosa' => $this->FormatInput($validated['diagnosa']),
+            'temuan_klinis' => $this->FormatInput($validated['temuan_klinis']),
             'dokter_pemeriksa' => $validated['dokter_pemeriksa'],
             'created_at' => now(),
         ]);
@@ -64,22 +86,15 @@ class RekamMedisController extends Controller
         $rekamMedis = RekamMedis::findOrFail($idrekam_medis);
 
         // Validasi input
-        $validated = $request->validate([
-            'idreservasi_dokter' => 'nullable',
-            'idpet' => 'nullable',
-            'anamnesa' => 'nullable',
-            'diagnosa' => 'nullable',
-            'temuan_klinis' => 'nullable',
-            'dokter_pemeriksa' => 'nullable'
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data rekam medis
         $rekamMedis->update([
             'idreservasi_dokter' => $validated['idreservasi_dokter'] ?? $rekamMedis->idreservasi_dokter,
             'idpet' => $validated['idpet'] ?? $rekamMedis->idpet,
-            'anamnesa' => $validated['anamnesa'] ?? $rekamMedis->anamnesa,
-            'diagnosa' => $validated['diagnosa'] ?? $rekamMedis->diagnosa,
-            'temuan_klinis' => $validated['temuan_klinis'] ?? $rekamMedis->temuan_klinis,
+            'anamnesa' => $this->FormatInput($validated['anamnesa']) ?? $rekamMedis->anamnesa,
+            'diagnosa' => $this->FormatInput($validated['diagnosa']),
+            'temuan_klinis' => $this->FormatInput($validated['temuan_klinis']) ?? $rekamMedis->temuan_klinis,
             'dokter_pemeriksa' => $validated['dokter_pemeriksa'] ?? $rekamMedis->dokter_pemeriksa,
         ]);
 

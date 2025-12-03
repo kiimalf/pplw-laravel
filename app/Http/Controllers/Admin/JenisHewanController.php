@@ -10,6 +10,20 @@ use App\Models\JenisHewan;
 
 class JenisHewanController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'store')
+    {
+        $uniqueJenis = 'unique:jenis_hewan,nama_jenis_hewan';
+
+        return $request->validate([
+            'nama_jenis_hewan' => $mode === 'store' ? "required|$uniqueJenis" : 'nullable'
+        ]);
+    }
+
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $jenisHewans = JenisHewan::all();
@@ -28,13 +42,11 @@ class JenisHewanController extends Controller
     public function store(Request $request)
     {
         // Validasi input
-        $validated = $request->validate([
-            'nama_jenis_hewan' => 'required'
-        ]);
+        $validated = $this->validateData($request);
 
         // Buat user baru
         JenisHewan::create([
-            'nama_jenis_hewan' => $validated['nama_jenis_hewan'],
+            'nama_jenis_hewan' => $this->FormatInput($validated['nama_jenis_hewan']),
         ]);
 
         return redirect()->route('admin.jenis-hewan.index')->with('success', 'Jenis Hewan berhasil ditambahkan.');
@@ -45,13 +57,11 @@ class JenisHewanController extends Controller
         $jenisHewans = JenisHewan::findOrFail($idjenis_hewan);
 
         // Validasi input
-        $validated = $request->validate([
-            'nama_jenis_hewan' => 'nullable|string|max:255',
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         // Update data user
         $jenisHewans->update([
-            'nama_jenis_hewan' => $validated['nama_jenis_hewan'] ?? $jenisHewans->nama_role,
+            'nama_jenis_hewan' => $this->FormatInput($validated['nama_jenis_hewan']) ?? $jenisHewans->nama_role,
         ]);
 
         return redirect()->route('admin.jenis-hewan.index')->with('success', 'Jenis Hewan berhasil diperbarui.');

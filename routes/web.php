@@ -55,10 +55,10 @@ Route::middleware('auth')->group(function () {
         // ROLE USER
         Route::get('/role-user/index', [App\Http\Controllers\Admin\RoleUserController::class, 'index'])->name('role-user.index');
         Route::get('/role-user/create', [App\Http\Controllers\Admin\RoleUserController::class, 'create'])->name('role-user.create');
-        Route::get('/role-user/edit/{idrole_user}',[App\Http\Controllers\Admin\RoleUserController::class, 'edit'])->name('role-user.edit');
+        Route::get('/role-user/edit/{iduser}',[App\Http\Controllers\Admin\RoleUserController::class, 'edit'])->name('role-user.edit');
 
         Route::post('/role-user/store', [App\Http\Controllers\Admin\RoleUserController::class, 'store'])->name('role-user.store');
-        Route::post('/role-user/update/{idrole_user}',[App\Http\Controllers\Admin\RoleUserController::class, 'update'])->name('role-user.update');
+        Route::post('/role-user/updateStatus/{idrole_user}',[App\Http\Controllers\Admin\RoleUserController::class, 'updateStatus'])->name('role-user.updateStatus');
         Route::delete('/role-user/{idrole_user}/delete', [App\Http\Controllers\Admin\RoleUserController::class, 'delete'])->name('role-user.delete');
 
         // JENIS HEWAN
@@ -199,7 +199,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [Dashboard::class, 'index'])->name('dashboard');
 
         Route::get('/pet/index', [App\Http\Controllers\Dokter\PetController::class, 'index'])->name('pet.index');
-        
+
         // REKAM MEDIS
         Route::get('/rekam-medis/index', [App\Http\Controllers\Perawat\RekamMedisController::class, 'index'])->name('rekam-medis.index');
         Route::get('/rekam-medis/create', [App\Http\Controllers\Perawat\RekamMedisController::class, 'create'])->name('rekam-medis.create');

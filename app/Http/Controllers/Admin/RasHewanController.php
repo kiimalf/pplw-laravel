@@ -10,6 +10,25 @@ use App\Models\jenisHewan;
 
 class RasHewanController extends Controller
 {
+    protected function validateData(Request $request, $mode = 'create')
+    {
+        $uniqueRas = 'unique:ras_hewan,nama_ras';
+
+        $rules = [
+            'nama_ras' =>"required|$uniqueRas",
+            'jenis_hewan' => 'required',
+        ];
+        if ($mode === 'update') {
+            foreach ($rules as &$rule) $rule = 'nullable';
+        }
+
+        return $request->validate($rules);
+    }
+    protected function FormatInput($input)
+    {
+        return ucwords(strtolower($input));
+    }
+
     public function index()
     {
         $rasHewans = RasHewan::all();
@@ -29,13 +48,10 @@ class RasHewanController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nama_ras' =>'required',
-            'jenis_hewan' => 'required'
-        ]);
+        $validated = $this->validateData($request);
 
         RasHewan::create([
-            'nama_ras' => $validated['nama_ras'],
+            'nama_ras' => $this->FormatInput($validated['nama_ras']),
             'idjenis_hewan' => $validated['jenis_hewan'],
         ]);
 
@@ -45,13 +61,10 @@ class RasHewanController extends Controller
     {
         $rasHewan = RasHewan::findOrFail($idras_hewan);
 
-        $validated = $request->validate([
-            'nama_ras' =>'nullable',
-            'jenis_hewan' => 'nullable'
-        ]);
+        $validated = $this->validateData($request, 'update');
 
         $rasHewan->update([
-            'nama_ras' => $validated['nama_ras'] ?? $rasHewan->nama_ras,
+            'nama_ras' => $this->FormatInput($validated['nama_ras']) ?? $rasHewan->nama_ras,
             'idjenis_hewan' => $validated['jenis_hewan']?? $rasHewan->idjenis_hewan,
         ]);
         
