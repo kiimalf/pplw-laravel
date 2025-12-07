@@ -4,105 +4,134 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Models\Pemilik;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class PemilikController extends Controller
 {
     protected function validateData(Request $request, $mode = 'create')
     {
-        $uniqueEmail ='unique:User,email';
-        $rules = [
-            'nama' => 'required|string',
-            'email' => "required|email|$uniqueEmail",
-            'no_wa' => 'required|string',
-            'alamat' => 'required|string',
-        ];
+        $uniqueEmail = 'unique:user,email';
+
         if ($mode === 'update') {
-            $rules = [
-                'nama' => 'nullable|string',
-                'email' => "nullable|email|$uniqueEmail",
-                'no_wa' => 'nullable|string',
-                'alamat' => 'nullable|string',
-            ];
+            $uniqueEmail .= ',' . $request->iduser . ',iduser';
         }
-        return $request->validate($rules);
+
+        return $request->validate([
+            'nama'   => $mode === 'create' ? 'required|string' : 'nullable|string',
+            'email'  => $mode === 'create' ? "required|email|$uniqueEmail" : "nullable|email",
+            'no_wa'  => $mode === 'create' ? 'required|string' : 'nullable|string',
+            'alamat' => $mode === 'create' ? 'required|string' : 'nullable|string',
+        ]);
     }
+
     protected function FormatInput($input)
     {
         return ucwords(strtolower($input));
     }
 
+    /**
+     * INDEX (JOIN user + pemilik)
+     */
     public function index()
     {
-        $pemiliks = Pemilik::all();
+        $pemiliks = DB::table('pemilik')
+            ->join('user', 'user.iduser', '=', 'pemilik.iduser')
+            ->select('pemilik.*', 'user.nama', 'user.email')
+            ->get();
+
         return view('admin.pemilik.index', compact('pemiliks'));
     }
-     public function create()
+
+    /**
+     * CREATE VIEW
+     */
+    public function create()
     {
         return view('admin.pemilik.create');
     }
 
+    /**
+     * EDIT (JOIN user)
+     */
     public function edit($idpemilik)
     {
-        $pemilik = Pemilik::findOrFail($idpemilik);
-        $user = User::findOrFail($pemilik->iduser);
+        $pemilik = DB::table('pemilik')->where('idpemilik', $idpemilik)->first();
+
+        if (!$pemilik) abort(404);
+
+        $user = DB::table('user')
+            ->where('iduser', $pemilik->iduser)
+            ->first();
+
         return view('admin.pemilik.edit', compact('pemilik', 'user'));
     }
 
+    /**
+     * STORE (INSERT user + pemilik)
+     */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $this->validateData($request);
 
-        // Buat user baru
-        User::create([
-            'nama' => $this->FormatInput($validated['alamat']),
-            'email' => $validated['email'],
-            'password' => bcrypt('123456'), // Set password default
+        // Insert user
+        $iduser = DB::table('user')->insertGetId([
+            'nama'     => $this->FormatInput($validated['nama']),
+            'email'    => $validated['email'],
+            'password' => bcrypt('123456'), // Default password
         ]);
 
-        Pemilik::create([
-            'iduser' => User::where('email', $validated['email'])->first()->iduser,
-            'no_wa' => $validated['no_wa'],
+        // Insert pemilik
+        DB::table('pemilik')->insert([
+            'iduser' => $iduser,
+            'no_wa'  => $validated['no_wa'],
             'alamat' => $this->FormatInput($validated['alamat']),
         ]);
 
-        return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik berhasil ditambahkan.');
+        return redirect()->route('admin.pemilik.index')
+            ->with('success', 'Pemilik berhasil ditambahkan.');
     }
 
+    /**
+     * UPDATE (UPDATE user + pemilik)
+     */
     public function update(Request $request, $idpemilik)
     {
-        // Temukan user yang akan diupdate
-        $pemilik = Pemilik::findOrFail($idpemilik);
-        $user = User::findOrFail($pemilik->iduser);
+        $pemilik = DB::table('pemilik')->where('idpemilik', $idpemilik)->first();
+        if (!$pemilik) abort(404);
 
-        // Validasi input
         $validated = $this->validateData($request, 'update');
 
-        // Update data user
-        $user->update([
-            'nama' => $this->FormatInput($validated['nama']) ?? $user->nama,
-            'email' => $validated['email'] ?? $user->email,
+        // Update user
+        DB::table('user')->where('iduser', $pemilik->iduser)->update([
+            'nama'  => $validated['nama']   ? $this->FormatInput($validated['nama']) : DB::raw('nama'),
+            'email' => $validated['email']  ?? DB::raw('email'),
         ]);
 
-        // Update data pemilik
-        $pemilik->update([
-            'no_wa' => $validated['no_wa'] ?? $pemilik->no_wa,
-            'alamat' => $this->FormatInput($validated['alamat']) ?? $pemilik->alamat,
+        // Update pemilik
+        DB::table('pemilik')->where('idpemilik', $idpemilik)->update([
+            'no_wa'  => $validated['no_wa']  ?? DB::raw('no_wa'),
+            'alamat' => $validated['alamat'] ? $this->FormatInput($validated['alamat']) : DB::raw('alamat'),
         ]);
 
-        return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik berhasil diperbarui.');
+        return redirect()->route('admin.pemilik.index')
+            ->with('success', 'Pemilik berhasil diperbarui.');
     }
 
+    /**
+     * DELETE (DELETE pemilik + user)
+     */
     public function delete($idpemilik)
     {
-        $pemilik = Pemilik::findOrFail($idpemilik);
-        $user = User::findOrFail($pemilik->iduser);
-        $pemilik->delete();
-        $user->delete();
+        $pemilik = DB::table('pemilik')->where('idpemilik', $idpemilik)->first();
+        if (!$pemilik) abort(404);
 
-        return redirect()->route('admin.pemilik.index')->with('success', 'Pemilik berhasil dihapus.');
+        // Delete pemilik
+        DB::table('pemilik')->where('idpemilik', $idpemilik)->delete();
+
+        // Delete user
+        DB::table('user')->where('iduser', $pemilik->iduser)->delete();
+
+        return redirect()->route('admin.pemilik.index')
+            ->with('success', 'Pemilik berhasil dihapus.');
     }
 }

@@ -1,92 +1,160 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.lte.main')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("You're logged in!") }}
-                </div>
+@section('content')
+
+{{-- HEADER --}}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Dashboard</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Widget User -->
-            <a href="{{ route('admin.user.index') }}" class="bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 p-6 flex items-left gap-6">
-                <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">Data User</h2>
-                    <p class="text-sm text-gray-500 mt-1">Kelola akun pengguna sistem</p>
-                </div>
-                
-            </a>
-
-            <!-- Widget Role -->
-            {{-- <a href="{{ route('role.index') }}" 
-            class="bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 p-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">Data Role</h2>
-                    <p class="text-sm text-gray-500 mt-1">Atur hak akses pengguna</p>
-                </div>
-                <div class="bg-purple-100 text-purple-600 p-3 rounded-full">
-                    <x-lucide-shield class="w-6 h-6" />
-                </div>
-            </a>
-
-            <!-- Widget Pemilik -->
-            <a href="{{ route('pemilik.index') }}" 
-            class="bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 p-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">Data Pemilik</h2>
-                    <p class="text-sm text-gray-500 mt-1">Informasi pemilik hewan</p>
-                </div>
-                <div class="bg-green-100 text-green-600 p-3 rounded-full">
-                    <x-lucide-user-circle class="w-6 h-6" />
-                </div>
-            </a>
-
-            <!-- Widget Hewan -->
-            <a href="{{ route('hewan.index') }}" 
-            class="bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 p-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">Data Hewan</h2>
-                    <p class="text-sm text-gray-500 mt-1">Daftar hewan peliharaan</p>
-                </div>
-                <div class="bg-amber-100 text-amber-600 p-3 rounded-full">
-                    <x-lucide-paw-print class="w-6 h-6" />
-                </div>
-            </a>
-
-            <!-- Widget Layanan -->
-            <a href="{{ route('layanan.index') }}" 
-            class="bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 p-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">Data Layanan</h2>
-                    <p class="text-sm text-gray-500 mt-1">Jenis layanan klinik</p>
-                </div>
-                <div class="bg-orange-100 text-orange-600 p-3 rounded-full">
-                    <x-lucide-briefcase-medical class="w-6 h-6" />
-                </div>
-            </a>
-
-            <!-- Widget Obat -->
-            <a href="{{ route('obat.index') }}" 
-            class="bg-white rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1 p-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-gray-700">Data Obat</h2>
-                    <p class="text-sm text-gray-500 mt-1">Persediaan obat klinik</p>
-                </div>
-                <div class="bg-rose-100 text-rose-600 p-3 rounded-full">
-                    <x-lucide-pill class="w-6 h-6" />
-                </div>
-            </a> --}}
-        </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+
+{{-- CONTENT --}}
+<div class="app-content">
+    <div class="container-fluid">
+
+        {{-- STAT CARDS --}}
+        <div class="row">
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>{{ $totalPets }}</h3>
+                        <p>Total Pet Terdaftar</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-paw"></i></div>
+                    <a href="{{ route('admin.pet.index') }}" class="small-box-footer">
+                        Lihat Data <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ $totalOwners }}</h3>
+                        <p>Total Pemilik</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-user"></i></div>
+                    <a href="{{ route('admin.pemilik.index') }}" class="small-box-footer">
+                        Lihat Data <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ $totalDoctors }}</h3>
+                        <p>Dokter Aktif</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-user-md"></i></div>
+                    <a href="{{ route('admin.user.index') }}" class="small-box-footer">
+                        Lihat Data <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{ $waitingReservasi }}</h3>
+                        <p>Reservasi Menunggu</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-clock"></i></div>
+                    <a href="{{ route('admin.temu-dokter.index') }}" class="small-box-footer">
+                        Lihat Reservasi <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        {{-- ROW 2 --}}
+        <div class="row">
+
+            {{-- RESERVASI TERBARU --}}
+            <div class="col-lg-6">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Reservasi Terbaru</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>No Urut</th>
+                                    <th>Nama Pet</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($recentReservasi as $item)
+                                    <tr>
+                                        <td>{{ $item->no_urut }}</td>
+                                        <td>{{ $item->nama_pet }}</td>
+                                        <td>
+                                            @if ($item->status == 0)
+                                                <span class="badge bg-warning">Menunggu</span>
+                                            @else
+                                                <span class="badge bg-success">Selesai</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Belum ada reservasi.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {{-- REKAM MEDIS TERBARU --}}
+            <div class="col-lg-6">
+                <div class="card card-success card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Rekam Medis Terbaru</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID Rekam Medis</th>
+                                    <th>Nama Pet</th>
+                                    <th>Dokter Pemeriksa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($recentRekamMedis as $rm)
+                                    <tr>
+                                        <td>{{ $rm->idrekam_medis }}</td>
+                                        <td>{{ $rm->nama_pet }}</td>
+                                        <td>{{ $rm->dokter }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Belum ada rekam medis.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@endsection

@@ -4,76 +4,120 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Models\RasHewan;
-use App\Models\jenisHewan;
+use Illuminate\Support\Facades\DB;
 
 class RasHewanController extends Controller
 {
     protected function validateData(Request $request, $mode = 'create')
     {
-        $uniqueRas = 'unique:ras_hewan,nama_ras';
-
         $rules = [
-            'nama_ras' =>"required|$uniqueRas",
+            'nama_ras' => "required|unique:ras_hewan,nama_ras",
             'jenis_hewan' => 'required',
         ];
+
         if ($mode === 'update') {
-            foreach ($rules as &$rule) $rule = 'nullable';
+            $rules = [
+                'nama_ras' => 'nullable',
+                'jenis_hewan' => 'nullable',
+            ];
         }
 
         return $request->validate($rules);
     }
+
     protected function FormatInput($input)
     {
         return ucwords(strtolower($input));
     }
 
+    /**
+     * INDEX: JOIN ras_hewan + jenis_hewan
+     */
     public function index()
     {
-        $rasHewans = RasHewan::all();
-        return view('admin.ras-hewan.index', compacT('rasHewans'));
+        $rasHewans = DB::table('ras_hewan')
+            ->join('jenis_hewan', 'jenis_hewan.idjenis_hewan', '=', 'ras_hewan.idjenis_hewan')
+            ->select(
+                'ras_hewan.*',
+                'jenis_hewan.nama_jenis_hewan'
+            )
+            ->get();
+
+        return view('admin.ras-hewan.index', compact('rasHewans'));
     }
+
+    /**
+     * CREATE: Ambil semua jenis hewan
+     */
     public function create()
-    {   
-        $jenisHewan = JenisHewan::all();
+    {
+        $jenisHewan = DB::table('jenis_hewan')->get();
         return view('admin.ras-hewan.create', compact('jenisHewan'));
     }
+
+    /**
+     * EDIT: JOIN satu record ras
+     */
     public function edit($idras_hewan)
     {
-        $rasHewan = RasHewan::findOrFail($idras_hewan);
-        $jenisHewan = jenisHewan::whereNot('idjenis_hewan', $rasHewan->idjenis_hewan)->get();
+        $rasHewan = DB::table('ras_hewan')
+            ->join('jenis_hewan', 'jenis_hewan.idjenis_hewan', '=', 'ras_hewan.idjenis_hewan')
+            ->select(
+                'ras_hewan.*',
+                'jenis_hewan.nama_jenis_hewan'
+            )
+            ->where('ras_hewan.idras_hewan', $idras_hewan)
+            ->first();
+
+        // ambil list jenis hewan lain untuk dropdown
+        $jenisHewan = DB::table('jenis_hewan')
+            ->where('idjenis_hewan', '!=', $rasHewan->idjenis_hewan)
+            ->get();
+
         return view('admin.ras-hewan.edit', compact('rasHewan', 'jenisHewan'));
     }
 
+    /**
+     * STORE
+     */
     public function store(Request $request)
     {
         $validated = $this->validateData($request);
 
-        RasHewan::create([
+        DB::table('ras_hewan')->insert([
             'nama_ras' => $this->FormatInput($validated['nama_ras']),
             'idjenis_hewan' => $validated['jenis_hewan'],
         ]);
 
         return redirect()->route('admin.ras-hewan.index')->with('success', 'Ras Berhasil Ditambahkan');
     }
+
+    /**
+     * UPDATE
+     */
     public function update(Request $request, $idras_hewan)
     {
-        $rasHewan = RasHewan::findOrFail($idras_hewan);
-
         $validated = $this->validateData($request, 'update');
 
-        $rasHewan->update([
-            'nama_ras' => $this->FormatInput($validated['nama_ras']) ?? $rasHewan->nama_ras,
-            'idjenis_hewan' => $validated['jenis_hewan']?? $rasHewan->idjenis_hewan,
-        ]);
-        
-        return redirect()->route('admin.ras-hewan.index')->with('success', 'Ras Berhasil DIperbarui');
+        DB::table('ras_hewan')
+            ->where('idras_hewan', $idras_hewan)
+            ->update([
+                'nama_ras' => $validated['nama_ras']
+                    ? $this->FormatInput($validated['nama_ras'])
+                    : DB::raw('nama_ras'),
+                'idjenis_hewan' => $validated['jenis_hewan']
+                    ?? DB::raw('idjenis_hewan'),
+            ]);
+
+        return redirect()->route('admin.ras-hewan.index')->with('success', 'Ras Berhasil Diperbarui');
     }
+
+    /**
+     * DELETE
+     */
     public function delete($idras_hewan)
     {
-        $rasHewan = RasHewan::findOrFail($idras_hewan);
-        $rasHewan->delete();
+        DB::table('ras_hewan')->where('idras_hewan', $idras_hewan)->delete();
 
         return redirect()->route('admin.ras-hewan.index')->with('success', 'Ras Berhasil Dihapus');
     }

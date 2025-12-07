@@ -3,76 +3,103 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
-use App\Models\Kategori;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KategoriController extends Controller
 {
     protected function validateData(Request $request, $mode = 'create')
     {
-        $uniqueNama ='unique:kategori,nama_kategori';
-        $rules = [
-            'nama_kategori' => "required|$uniqueNama",
-        ];
-        if ($mode === 'update') {
-            $rules = [
-                'nama_kategori' => "nullable|$uniqueNama",
-            ];
-        }
-        return $request->validate($rules);
+        $uniqueNama = 'unique:kategori,nama_kategori';
+
+        return $request->validate([
+            'nama_kategori' => $mode === 'create'
+                ? "required|$uniqueNama"
+                : "nullable|$uniqueNama",
+        ]);
     }
+
     protected function FormatInput($input)
     {
         return ucwords(strtolower($input));
     }
+
+    // =======================
+    // INDEX (Query Builder)
+    // =======================
     public function index()
     {
-        $kategoris = Kategori::all();
+        $kategoris = DB::table('kategori')->get();
+
         return view('admin.kategori.index', compact('kategoris'));
     }
+
     public function create()
     {
         return view('admin.kategori.create');
     }
+
+    // =======================
+    // EDIT (Query Builder)
+    // =======================
     public function edit($idkategori)
     {
-        $kategori = Kategori::findOrFail($idkategori);
+        $kategori = DB::table('kategori')
+            ->where('idkategori', $idkategori)
+            ->first();
+
+        if (!$kategori) {
+            abort(404);
+        }
+
         return view('admin.kategori.edit', compact('kategori'));
     }
 
+    // =======================
+    // STORE (Query Builder)
+    // =======================
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $this->validateData($request);
 
-        // Buat user baru
-        Kategori::create([
+        DB::table('kategori')->insert([
             'nama_kategori' => $this->FormatInput($validated['nama_kategori']),
         ]);
 
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
+        return redirect()->route('admin.kategori.index')
+            ->with('success', 'Kategori berhasil ditambahkan.');
     }
+
+    // =======================
+    // UPDATE (Query Builder)
+    // =======================
     public function update(Request $request, $idkategori)
     {
-        // Temukan user yang akan diupdate
-        $kategori = Kategori::findOrFail($idkategori);
-
-        // Validasi input
         $validated = $this->validateData($request, 'update');
 
-        // Update data user
-        $kategori->update([
-            'nama_kategori' => $this->FormatInput($validated['nama_kategori']) ?? $kategori->nama_kategori,
-        ]);
+        DB::table('kategori')
+            ->where('idkategori', $idkategori)
+            ->update([
+                'nama_kategori' =>
+                    !empty($validated['nama_kategori'])
+                        ? $this->FormatInput($validated['nama_kategori'])
+                        : DB::table('kategori')->where('idkategori', $idkategori)->value('nama_kategori')
+            ]);
 
-        return redirect()->route('admin.kategori.index')->with('success', 'KATEGORI berhasil diperbarui.');
+        return redirect()->route('admin.kategori.index')
+            ->with('success', 'Kategori berhasil diperbarui.');
     }
+
+    // =======================
+    // DELETE (Query Builder)
+    // =======================
     public function delete($idkategori)
     {
-        $kategori = Kategori::findOrFail($idkategori);
-        $kategori->delete();
+        DB::table('kategori')
+            ->where('idkategori', $idkategori)
+            ->delete();
 
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil dihapus.');
+        return redirect()->route('admin.kategori.index')
+            ->with('success', 'Kategori berhasil dihapus.');
     }
 }

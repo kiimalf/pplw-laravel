@@ -1,50 +1,87 @@
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Edit Ras {{ $rasHewan->nama_ras }}
+@extends('layouts.lte.main')
+
+@section('content')
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Edit Ras Hewan</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Master</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.ras-hewan.index') }}">Ras Hewan</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.ras-hewan.update', $rasHewan->idras_hewan) }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+<div class="app-content">
+<div class="container-fluid">
+
+    <div class="card card-warning card-outline">
+
+        <div class="card-header">
+            <h3 class="card-title">Edit: {{ $rasHewan->nama_ras }}</h3>
+        </div>
+
+        <form action="{{ route('admin.ras-hewan.update', $rasHewan->idras_hewan) }}" method="POST">
             @csrf
-            {{-- Nama --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Nama Role</label>
-                <input type="text" name="nama_ras" placeholder="{{ $rasHewan->nama_ras }}" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Jenis Hewan</label>
-                <select name="jenis_hewan" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="{{ $rasHewan->idjenis_hewan }}" selected >{{ $rasHewan->jenisHewan->nama_jenis_hewan }}</option>
-                    @foreach ($jenisHewan as $item)
-                        <option value="{{ $item->idjenis_hewan }}">{{ $item->nama_jenis_hewan }}</option>
-                    @endforeach
-                </select>
+
+            <div class="card-body">
+
+                {{-- Nama Ras --}}
+                <div class="mb-3">
+                    <label class="form-label">Nama Ras</label>
+                    <input type="text"
+                        name="nama_ras"
+                        value="{{ $rasHewan->nama_ras }}"
+                        class="form-control">
+                </div>
+
+                {{-- Jenis Hewan --}}
+                <div class="mb-3">
+                    <label class="form-label">Jenis Hewan</label>
+                    <select name="jenis_hewan" class="form-control">
+
+                        {{-- Jenis Hewan Yang Saat Ini --}}
+                        <option value="{{ $rasHewan->idjenis_hewan }}" selected>
+                            {{ $rasHewan->nama_jenis_hewan }}
+                        </option>
+
+                        {{-- Jenis Hewan Lain --}}
+                        @foreach ($jenisHewan as $item)
+                            <option value="{{ $item->idjenis_hewan }}">
+                                {{ $item->nama_jenis_hewan }}
+                            </option>
+                        @endforeach
+
+                    </select>
+                </div>
+
+                {{-- Error Message --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger mt-2">
+                        <ul class="ps-3 m-0">
+                            @foreach ($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.ras-hewan.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Update
-                    </button>
-                </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{{ route('admin.ras-hewan.index') }}" class="btn btn-secondary">Kembali</a>
+                <button class="btn btn-warning">Update</button>
             </div>
-            {{-- Tombol --}}
-            
+
         </form>
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection

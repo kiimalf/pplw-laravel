@@ -1,70 +1,131 @@
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Tambah Rekam Medis
+@extends('layouts.lte.main')
+
+@section('content')
+
+{{-- HEADER --}}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Tambah Rekam Medis</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Rekam Medis</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('admin.rekam-medis.index') }}">Data Rekam Medis</a>
+                    </li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.rekam-medis.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+
+{{-- CONTENT --}}
+<div class="app-content">
+<div class="container-fluid">
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Form Tambah Rekam Medis</h3>
+        </div>
+
+        <form action="{{ route('admin.rekam-medis.store') }}" method="POST">
             @csrf
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Reservasi</label>
-                <select name="idreservasi_dokter" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="" selected disabled>Pilih Reservasi</option>
-                    @foreach ($reservasi as $item)
-                        <option value="{{ $item->idreservasi_dokter }}">{{ $item->idreservasi_dokter }} - {{ $item->pet->nama }}</option>
-                    @endforeach
-                </select>
+
+            <div class="card-body">
+
+                {{-- RESERVASI --}}
+                <div class="form-group mb-3">
+                    <label>Reservasi</label>
+                    <select name="idreservasi_dokter"
+                            class="form-control @error('idreservasi_dokter') is-invalid @enderror">
+                        <option value="" disabled selected>Pilih Reservasi</option>
+
+                        @foreach ($reservasi as $item)
+                            <option value="{{ $item->idreservasi_dokter }}">
+                                {{ $item->idreservasi_dokter }} — {{ $item->nama_pet }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('idreservasi_dokter')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- ANAMNESA --}}
+                <div class="form-group mb-3">
+                    <label>Anamnesa</label>
+                    <input type="text"
+                        name="anamnesa"
+                        class="form-control @error('anamnesa') is-invalid @enderror"
+                        placeholder="Masukkan anamnesa">
+                    @error('anamnesa')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- TEMUAN KLINIS --}}
+                <div class="form-group mb-3">
+                    <label>Temuan Klinis</label>
+                    <input type="text"
+                        name="temuan_klinis"
+                        class="form-control @error('temuan_klinis') is-invalid @enderror"
+                        placeholder="Masukkan temuan klinis">
+                    @error('temuan_klinis')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- DIAGNOSA --}}
+                <div class="form-group mb-3">
+                    <label>Diagnosa</label>
+                    <input type="text"
+                        name="diagnosa"
+                        class="form-control @error('diagnosa') is-invalid @enderror"
+                        placeholder="Masukkan diagnosa">
+                    @error('diagnosa')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- DOKTER PEMERIKSA --}}
+                <div class="form-group mb-3">
+                    <label>Dokter Pemeriksa</label>
+                    <select name="dokter_pemeriksa"
+                            class="form-control @error('dokter_pemeriksa') is-invalid @enderror">
+                        <option value="" disabled selected>Pilih Dokter</option>
+
+                        @foreach ($dokter as $item)
+                            <option value="{{ $item->idrole_user }}">
+                                {{ $item->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('dokter_pemeriksa')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
             </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Anamnesa</label>
-                <input type="text" name="anamnesa"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
+            {{-- FOOTER --}}
+            <div class="card-footer d-flex justify-content-end gap-2">
+                <a href="{{ route('admin.rekam-medis.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+
+                <button class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
             </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Temuan Klinis</label>
-                <input type="text" name="temuan_klinis"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Diagnosa</label>
-                <input type="text" name="diagnosa"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Dokter Pemeriksa</label>
-                <select name="dokter_pemeriksa" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="" selected disabled>Pilih Dokter</option>
-                    @foreach ($dokter as $item)
-                        <option value="{{ $item->idrole_user }}">{{ $item->user->nama }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <input type="hidden" value="$">
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.rekam-medis.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Simpan
-                    </button>
-                </div>
-            </div>
-            {{-- Tombol --}}
-            
+
         </form>
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection
