@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
         <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
             Data Rekam Medis
@@ -80,4 +80,92 @@
 
         </table>
     </div>
-</x-app-layout>
+</x-app-layout> --}}
+
+@extends('layouts.lte.main')
+
+@section('content')
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Data Rekam Medis</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Rekam Medis</a></li>
+                    <li class="breadcrumb-item active">Data Rekam Medis</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+
+        <div class="row mb-3">
+            <div class="col text-end">
+                <a href="{{ route('admin.rekam-medis.create') }}" class="btn btn-primary">
+                    + Tambah Rekam
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Tabel Rekam Medis</h3></div>
+
+            <div class="card-body">
+                <table class="table table-bordered table-hover table-sm align-middle">
+                    <thead class="text-center">
+                        <tr>
+                            <th>#</th>
+                            <th>Tanggal</th>
+                            <th>Nama Pet</th>
+                            <th>Anamnesa</th>
+                            <th>Temuan Klinis</th>
+                            <th>Diagnosa</th>
+                            <th>Dokter</th>
+                            <th>ID Reservasi</th>
+                            <th style="width: 120px">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($rekamMedisS as $row)
+                        <tr class="text-center">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $row->created_at }}</td>
+                            <td>{{ $row->nama_pet }}</td>
+                            <td>{{ $row->anamnesa }}</td>
+                            <td>{{ $row->temuan_klinis }}</td>
+                            <td>{{ $row->diagnosa }}</td>
+                            <td>{{ $row->nama_dokter }}</td>
+                            <td>{{ $row->idreservasi_dokter }}</td>
+
+                            <td>
+                                <a href="{{ route('admin.rekam-medis.detail', $row->idrekam_medis) }}"
+                                    class="btn btn-info btn-sm">Detail</a>
+
+                                <form action="{{ route('admin.rekam-medis.delete', $row->idrekam_medis) }}"
+                                      method="POST"
+                                      style="display:inline-block;"
+                                      onsubmit="return confirm('Hapus rekam medis ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="9" class="text-center text-muted">Belum ada data.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@endsection

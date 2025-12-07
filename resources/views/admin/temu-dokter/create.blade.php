@@ -1,60 +1,110 @@
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Tambah Temu Dokter
+@extends('layouts.lte.main')
+
+@section('content')
+
+{{-- HEADER --}}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Tambah Temu Dokter</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Rekam Medis</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.temu-dokter.index') }}">Temu Dokter</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.temu-dokter.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+{{-- CONTENT --}}
+<div class="app-content">
+<div class="container-fluid">
+
+    <div class="card card-primary">
+
+        <div class="card-header">
+            <h3 class="card-title">Form Tambah Temu Dokter</h3>
+        </div>
+
+        <form action="{{ route('admin.temu-dokter.store') }}" method="POST">
             @csrf
-            {{-- Nama --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">No Urut</label>
-                <input type="text" name="no_urut"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Pet</label>
-                <select name="idpet" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-                    <option value="" selected disabled>Pilih Pet</option>
-                    @foreach ($pets as $pet)
-                        <option value="{{ $pet->idpet }}">{{ $pet->nama }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Dokter</label>
-                <select name="idrole_user" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-                    <option value="" selected disabled>Pilih Dokter</option>
-                    @foreach ($dokters as $dokter)
-                        <option value="{{ $dokter->idrole_user }}">{{ $dokter->user->nama }}</option>
-                    @endforeach
-                </select>
+
+            <div class="card-body">
+
+                {{-- NO URUT --}}
+                <div class="form-group mb-3">
+                    <label>No Urut</label>
+                    <input 
+                        type="text" 
+                        name="no_urut" 
+                        value="{{ old('no_urut') }}"
+                        class="form-control @error('no_urut') is-invalid @enderror" 
+                        placeholder="Masukkan nomor urut">
+                    @error('no_urut')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- PET --}}
+                <div class="form-group mb-3">
+                    <label>Pet</label>
+                    <select 
+                        name="idpet" 
+                        class="form-control @error('idpet') is-invalid @enderror">
+                        <option value="" disabled selected>Pilih Pet</option>
+
+                        @foreach ($pets as $pet)
+                            <option value="{{ $pet->idpet }}">
+                                {{ $pet->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('idpet')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- DOKTER --}}
+                <div class="form-group mb-3">
+                    <label>Dokter</label>
+                    <select 
+                        name="idrole_user" 
+                        class="form-control @error('idrole_user') is-invalid @enderror">
+                        <option value="" disabled selected>Pilih Dokter</option>
+
+                        @foreach ($dokters as $dokter)
+                            <option value="{{ $dokter->idrole_user }}">
+                                {{ $dokter->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('idrole_user')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.temu-dokter.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Simpan
-                    </button>
-                </div>
+            {{-- FOOTER --}}
+            <div class="card-footer d-flex justify-content-end gap-2">
+                <a href="{{ route('admin.temu-dokter.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
             </div>
-            {{-- Tombol --}}
-            
+
         </form>
+
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection

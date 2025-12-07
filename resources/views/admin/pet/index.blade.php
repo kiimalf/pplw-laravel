@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
         <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
             Data Pet
@@ -84,4 +84,92 @@
 
         </table>
     </div>
-</x-app-layout>
+</x-app-layout> --}}
+
+@extends('layouts.lte.main')
+
+@section('content')
+
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Pet</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Master</a></li>
+                    <li class="breadcrumb-item active">Pet</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col text-end">
+                <a href="{{ route('admin.pet.create') }}" class="btn btn-primary">
+                    + Tambah Pet
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Tabel Data Pet</h3></div>
+
+            <div class="card-body">
+                <table class="table table-bordered table-hover table-sm align-middle">
+                    <thead class="text-center">
+                        <tr>
+                            <th style="width: 32px">#</th>
+                            <th>Nama Pet</th>
+                            <th>Tanggal Lahir</th>
+                            <th>Warna Tanda</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Pemilik</th>
+                            <th>Ras Hewan</th>
+                            <th style="width: 120px">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($pets as $pet)
+                        <tr class="text-center">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $pet->nama }}</td>
+                            <td>{{ $pet->tanggal_lahir }}</td>
+                            <td>{{ $pet->warna_tanda }}</td>
+                            <td>{{ $pet->jenis_kelamin == '0' ? 'Jantan' : 'Betina' }}</td>
+                            <td>{{ $pet->nama_pemilik }}</td>
+                            <td>{{ $pet->nama_ras }}</td>
+
+                            <td>
+                                <a href="{{ route('admin.pet.edit', $pet->idpet) }}"
+                                    class="btn btn-warning btn-sm">Edit</a>
+
+                                <form action="{{ route('admin.pet.delete', $pet->idpet) }}"
+                                      method="POST"
+                                      style="display:inline-block;"
+                                      onsubmit="return confirm('Yakin ingin menghapus Pet ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted">Belum ada data.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@endsection

@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Models\JenisHewan;
+use Illuminate\Support\Facades\DB;
 
 class JenisHewanController extends Controller
 {
@@ -24,53 +22,80 @@ class JenisHewanController extends Controller
         return ucwords(strtolower($input));
     }
 
+    /**
+     * INDEX
+     */
     public function index()
     {
-        $jenisHewans = JenisHewan::all();
+        $jenisHewans = DB::table('jenis_hewan')->get();
+
         return view('admin.jenis-hewan.index', compact('jenisHewans'));
     }
+
+    /**
+     * CREATE
+     */
     public function create()
     {
         return view('admin.jenis-hewan.create');
     }
+
+    /**
+     * EDIT
+     */
     public function edit($idjenis_hewan)
     {
-        $jenisHewan = JenisHewan::findOrFail($idjenis_hewan);
+        $jenisHewan = DB::table('jenis_hewan')
+            ->where('idjenis_hewan', $idjenis_hewan)
+            ->first();
+
         return view('admin.jenis-hewan.edit', compact('jenisHewan'));
     }
 
+    /**
+     * STORE
+     */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $this->validateData($request);
 
-        // Buat user baru
-        JenisHewan::create([
+        DB::table('jenis_hewan')->insert([
             'nama_jenis_hewan' => $this->FormatInput($validated['nama_jenis_hewan']),
         ]);
 
-        return redirect()->route('admin.jenis-hewan.index')->with('success', 'Jenis Hewan berhasil ditambahkan.');
+        return redirect()->route('admin.jenis-hewan.index')
+            ->with('success', 'Jenis Hewan berhasil ditambahkan.');
     }
+
+    /**
+     * UPDATE
+     */
     public function update(Request $request, $idjenis_hewan)
     {
-        // Temukan user yang akan diupdate
-        $jenisHewans = JenisHewan::findOrFail($idjenis_hewan);
-
-        // Validasi input
         $validated = $this->validateData($request, 'update');
 
-        // Update data user
-        $jenisHewans->update([
-            'nama_jenis_hewan' => $this->FormatInput($validated['nama_jenis_hewan']) ?? $jenisHewans->nama_role,
-        ]);
+        DB::table('jenis_hewan')
+            ->where('idjenis_hewan', $idjenis_hewan)
+            ->update([
+                'nama_jenis_hewan' => $validated['nama_jenis_hewan']
+                    ? $this->FormatInput($validated['nama_jenis_hewan'])
+                    : DB::raw('nama_jenis_hewan'),
+            ]);
 
-        return redirect()->route('admin.jenis-hewan.index')->with('success', 'Jenis Hewan berhasil diperbarui.');
+        return redirect()->route('admin.jenis-hewan.index')
+            ->with('success', 'Jenis Hewan berhasil diperbarui.');
     }
+
+    /**
+     * DELETE
+     */
     public function delete($idjenis_hewan)
     {
-        $jenisHewans = JenisHewan::findOrFail($idjenis_hewan);
-        $jenisHewans->delete();
+        DB::table('jenis_hewan')
+            ->where('idjenis_hewan', $idjenis_hewan)
+            ->delete();
 
-        return redirect()->route('admin.jenis-hewan.index')->with('success', 'Role berhasil dihapus.');
+        return redirect()->route('admin.jenis-hewan.index')
+            ->with('success', 'Jenis Hewan berhasil dihapus.');
     }
 }

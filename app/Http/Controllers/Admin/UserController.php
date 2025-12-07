@@ -4,24 +4,32 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        // SELECT * FROM user
+        $users = DB::table('user')->get();
 
         return view('admin.user.index', compact('users'));
     }
+
     public function create()
     {
         return view('admin.user.create');
     }
+
     public function edit($iduser)
     {
-        $user = User::findOrFail($iduser);
+        // SELECT * FROM user WHERE iduser = ?
+        $user = DB::table('user')->where('iduser', $iduser)->first();
+
+        if (!$user) {
+            abort(404);
+        }
+
         return view('admin.user.edit', compact('user'));
     }
 
@@ -29,67 +37,73 @@ class UserController extends Controller
     {
         $validated = $this->validateUser($request);
 
-        $this->createUser($validated);
+        // INSERT INTO user (...)
+        DB::table('user')->insert([
+            'nama'     => $this->formatNama($validated['nama']),
+            'email'    => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
 
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil ditambahkan.');
+        return redirect()
+            ->route('admin.user.index')
+            ->with('success', 'User berhasil ditambahkan.');
     }
+
     public function update(Request $request, $iduser)
     {
-        // Temukan user yang akan diupdate
-        $user = User::findOrFail($iduser);
+        $validated = $this->validateUser($request, $iduser);
 
-        // Validasi input
-        $validated = $request->validate([
-            'nama' => 'nullable|string|max:255',
-            'email' => 'nullable|string|email|max:255|unique:user,email,' . $iduser . ',iduser',
-            'password' => 'nullable|string|min:3',
+        $user = DB::table('user')->where('iduser', $iduser)->first();
+        if (!$user) {
+            abort(404);
+        }
+
+        // Jika password kosong, tetap pakai password lama
+        $password = $validated['password']
+            ? bcrypt($validated['password'])
+            : $user->password;
+
+        // UPDATE user
+        DB::table('user')->where('iduser', $iduser)->update([
+            'nama'     => $validated['nama'],
+            'email'    => $validated['email'],
+            'password' => $password,
         ]);
 
-        // Update data user
-        $user->update([
-            'nama' => $validated['nama'] ?? $user->nama,
-            'email' => $validated['email'] ?? $user->email,
-            'password' => !empty($validated['password']) ? bcrypt($validated['password']) : $user->password,
-        ]);
-
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil diperbarui.');
+        return redirect()
+            ->route('admin.user.index')
+            ->with('success', 'User berhasil diperbarui.');
     }
+
     public function delete($iduser)
     {
-        $user = User::findOrFail($iduser);
+        // delete relasi dari role_user jika ada
+        DB::table('role_user')->where('iduser', $iduser)->delete();
 
-        if(method_exists($user, 'roles')){
-            $user->roles()->detach();
-        } elseif(method_exists($user, 'pemilik')) {
-            dd($user);
-        }
-        $user->delete();
+        // delete pemilik jika ada
+        DB::table('pemilik')->where('iduser', $iduser)->delete();
 
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil dihapus.');
+        // delete user
+        DB::table('user')->where('iduser', $iduser)->delete();
+
+        return redirect()
+            ->route('admin.user.index')
+            ->with('success', 'User berhasil dihapus.');
     }
 
-
-    public function validateUser(request $request, $iduser = null)
+    private function validateUser(Request $request, $iduser = null)
     {
         $uniqueEmail = 'unique:user,email';
 
         if ($iduser) {
+            // unique:user,email,4,iduser
             $uniqueEmail .= ',' . $iduser . ',iduser';
         }
 
         return $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => "required|string|email|max:255|$uniqueEmail",
+            'nama'     => 'required|string|max:255',
+            'email'    => "required|string|email|max:255|$uniqueEmail",
             'password' => $iduser ? 'nullable|string|min:3' : 'required|string|min:3',
-        ]);
-    }
-
-    private function createUser($validated)
-    {
-        return User::create([
-            'nama' => $this->formatNama($validated['nama']),
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
         ]);
     }
 
@@ -97,6 +111,4 @@ class UserController extends Controller
     {
         return ucwords(strtolower($nama));
     }
-
-
 }

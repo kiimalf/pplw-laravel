@@ -1,77 +1,141 @@
+@extends('layouts.lte.main')
 
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Edit Pet {{ $pet->nama }}
+@section('content')
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Edit Pet {{ $pet->nama }}</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Pet</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.pet.index') }}">Pet</a></li>
+                    <li class="breadcrumb-item active">Edit</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.pet.update', $pet->idpet) }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+<div class="app-content">
+<div class="container-fluid">
+
+    @php
+        // ambil nama pemilik (karena controller tidak mengirimkan)
+        $namaPemilik = DB::table('pemilik')
+            ->join('user', 'user.iduser', '=', 'pemilik.iduser')
+            ->where('pemilik.idpemilik', $pet->idpemilik)
+            ->value('user.nama');
+
+        // ambil nama ras (karena controller tidak mengirimkan)
+        $namaRas = DB::table('ras_hewan')
+            ->where('idras_hewan', $pet->idras_hewan)
+            ->value('nama_ras');
+    @endphp
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Form Edit Pet</h3>
+        </div>
+
+        <form action="{{ route('admin.pet.update', $pet->idpet) }}" method="POST">
             @csrf
-            <div class="mb-4">
-                <<label class="block text-gray-700 dark:text-gray-200">Pemilik</label>
-                <input type="text" value="{{ $pet->pemilik->user->nama }}" disabled name="pemilik" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            {{-- Nama --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Nama Pet</label>
-                <input type="text" name="nama_pet" placeholder="{{ $pet->nama }}"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Tanggal Lahir</label>
-                <input type="date" value="{{ $pet->tanggal_lahir }}" name="tanggal_lahir" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Warna Tanda</label>
-                <input type="text" name="warna_tanda" placeholder="{{ $pet->warna_tanda }}"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Ras Hewan</label>
-                <select name="idras_hewan" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="{{ $pet->idras_hewan }}" selected >{{ $pet->rasHewan->nama_ras }}</option>
-                    @foreach ($rasHewan as $item)
-                        <option value="{{ $item->idras_hewan }}">{{ $item->nama_ras }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Jenis Kelamin</label>
-                <select name="jenis_kelamin" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    @if ($pet->jenis_kelamin == 0)
-                        <option value="0" selected>Jantan</option>
-                        <option value="1">Betina</option>
-                    @else
-                        <option value="0" >Jantan</option>
-                        <option value="1" selected>Betina</option>
-                    @endif
-                </select>
+
+            <div class="card-body">
+
+                {{-- PEMILIK (TIDAK BISA DIEDIT) --}}
+                <div class="form-group mb-3">
+                    <label>Pemilik</label>
+                    <input type="text" class="form-control" value="{{ $namaPemilik }}" disabled>
+                </div>
+
+                {{-- NAMA PET --}}
+                <div class="form-group mb-3">
+                    <label>Nama Pet</label>
+                    <input type="text" name="nama_pet"
+                        class="form-control @error('nama_pet') is-invalid @enderror"
+                        placeholder="{{ $pet->nama }}">
+                    @error('nama_pet')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- TANGGAL LAHIR --}}
+                <div class="form-group mb-3">
+                    <label>Tanggal Lahir</label>
+                    <input type="date" name="tanggal_lahir"
+                        class="form-control @error('tanggal_lahir') is-invalid @enderror"
+                        value="{{ $pet->tanggal_lahir }}">
+                    @error('tanggal_lahir')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- WARNA TANDA --}}
+                <div class="form-group mb-3">
+                    <label>Warna Tanda</label>
+                    <input type="text" name="warna_tanda"
+                        class="form-control @error('warna_tanda') is-invalid @enderror"
+                        placeholder="{{ $pet->warna_tanda }}">
+                    @error('warna_tanda')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- RAS HEWAN --}}
+                <div class="form-group mb-3">
+                    <label>Ras Hewan</label>
+
+                    <select name="idras_hewan" class="form-control select2 @error('idras_hewan') is-invalid @enderror">
+                        <option value="{{ $pet->idras_hewan }}" selected>
+                            {{ $namaRas }} (Saat ini)
+                        </option>
+                        @foreach ($rasHewan as $item)
+                            <option value="{{ $item->idras_hewan }}">
+                                {{ $item->nama_ras }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @error('idras_hewan')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- JENIS KELAMIN --}}
+                <div class="form-group mb-3">
+                    <label>Jenis Kelamin</label>
+                    <select name="jenis_kelamin" class="form-control">
+                        <option value="0" {{ $pet->jenis_kelamin == 0 ? 'selected' : '' }}>Jantan</option>
+                        <option value="1" {{ $pet->jenis_kelamin == 1 ? 'selected' : '' }}>Betina</option>
+                    </select>
+                </div>
+
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.pet.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Simpan
-                    </button>
-                </div>
+            <div class="card-footer d-flex justify-content-end gap-2">
+                <a href="{{ route('admin.pet.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
             </div>
-            {{-- Tombol --}}
-            
         </form>
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+    $('.select2').select2({
+        width: '100%',
+        theme: 'bootstrap4'
+    });
+</script>
+@endsection

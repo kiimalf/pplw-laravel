@@ -1,51 +1,81 @@
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Tambah Ras Hewan
+@extends('layouts.lte.main')
+
+@section('content')
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Tambah Ras Hewan</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Master</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.ras-hewan.index') }}">Ras Hewan</a></li>
+                    <li class="breadcrumb-item active">Tambah</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.ras-hewan.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+<div class="app-content">
+<div class="container-fluid">
+
+    <div class="card card-primary card-outline">
+
+        <div class="card-header">
+            <h3 class="card-title">Form Tambah Ras Hewan</h3>
+        </div>
+
+        <form action="{{ route('admin.ras-hewan.store') }}" method="POST">
             @csrf
-            {{-- Nama --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Nama Ras</label>
-                <input type="text" name="nama_ras"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Jenis Hewan</label>
-                <select name="jenis_hewan" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="" selected disabled>Pilih Jenis Hewan</option>
-                    @foreach ($jenisHewan as $item)
-                        <option value="{{ $item->idjenis_hewan }}">{{ $item->nama_jenis_hewan }}</option>
-                    @endforeach
-                </select>
+
+            <div class="card-body">
+
+                {{-- Jenis Hewan --}}
+                <div class="mb-3">
+                    <label class="form-label">Jenis Hewan</label>
+                    <select name="jenis_hewan" class="form-control">
+                        <option value="" disabled selected>Pilih Jenis Hewan</option>
+                        @foreach ($jenisHewan as $item)
+                            <option value="{{ $item->idjenis_hewan }}">
+                                {{ $item->nama_jenis_hewan }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Nama Ras --}}
+                <div class="mb-3">
+                    <label class="form-label">Nama Ras</label>
+                    <input type="text" name="nama_ras" 
+                           class="form-control" 
+                           placeholder="Masukkan nama ras hewan">
+                </div>
+
+                
+
+                {{-- Errors --}}
+                @if ($errors->any())
+                    <div class="alert alert-danger mt-2">
+                        <ul class="ps-3 m-0">
+                            @foreach ($errors->all() as $err)
+                                <li>{{ $err }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.ras-hewan.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Simpan
-                    </button>
-                </div>
+            <div class="card-footer d-flex justify-content-end">
+                <a href="{{ route('admin.ras-hewan.index') }}" class="btn btn-secondary">Kembali</a>
+                <button class="btn btn-primary">Simpan</button>
             </div>
-            {{-- Tombol --}}
-            
+
         </form>
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection

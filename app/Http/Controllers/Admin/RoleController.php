@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-use App\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
@@ -23,51 +22,66 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = Role::all();
+        // SELECT * FROM role
+        $roles = DB::table('role')->get();
+
         return view('admin.role.index', compact('roles'));
     }
+
     public function create()
     {
         return view('admin.role.create');
     }
+
     public function edit($idrole)
     {
-        $role = Role::findOrFail($idrole);
+        // SELECT * FROM role WHERE idrole = ?
+        $role = DB::table('role')->where('idrole', $idrole)->first();
+
+        if (!$role) abort(404);
+
         return view('admin.role.edit', compact('role'));
     }
 
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $this->validateData($request);
 
-        Role::create([
+        // INSERT
+        DB::table('role')->insert([
             'nama_role' => $this->FormatInput($validated['nama_role']),
         ]);
 
-        return redirect()->route('admin.role.index')->with('success', 'Role berhasil ditambahkan.');
+        return redirect()
+            ->route('admin.role.index')
+            ->with('success', 'Role berhasil ditambahkan.');
     }
 
     public function update(Request $request, $idrole)
     {
-        // Temukan user yang akan diupdate
-        $role = Role::findOrFail($idrole);
-
-        // Validasi input
         $validated = $this->validateData($request, 'update');
 
-        // Update data user
-        $role->update([
-            'nama_role' => $this->FormatInput($validated['nama_role']) ?? $role->nama_role,
-        ]);
+        // UPDATE
+        DB::table('role')
+            ->where('idrole', $idrole)
+            ->update([
+                'nama_role' => $validated['nama_role']
+                    ? $this->FormatInput($validated['nama_role'])
+                    : DB::table('role')->where('idrole', $idrole)->value('nama_role'),
+            ]);
 
-        return redirect()->route('admin.role.index')->with('success', 'Role berhasil diperbarui.');
+        return redirect()
+            ->route('admin.role.index')
+            ->with('success', 'Role berhasil diperbarui.');
     }
+
     public function delete($idrole)
     {
-        $role = Role::findOrFail($idrole);
-        $role->delete();
+        // DELETE role
+        DB::table('role')->where('idrole', $idrole)->delete();
 
-        return redirect()->route('admin.role.index')->with('success', 'Role berhasil dihapus.');
+        return redirect()
+            ->route('admin.role.index')
+            ->with('success', 'Role berhasil dihapus.');
     }
 }

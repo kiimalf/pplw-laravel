@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
         <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
             Data Kategori
@@ -68,4 +68,80 @@
 
         </table>
     </div>
-</x-app-layout>
+</x-app-layout> --}}
+
+@extends('layouts.lte.main')
+
+@section('content')
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6"><h3 class="mb-0">Kategori</h3></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Master</a></li>
+                    <li class="breadcrumb-item active">Kategori</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="app-content">
+    <div class="container-fluid">
+
+        <div class="row mb-3">
+            <div class="col text-end">
+                <a href="{{ route('admin.kategori.create') }}" class="btn btn-primary">
+                    + Tambah Kategori
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Tabel Data Kategori</h3></div>
+
+            <div class="card-body">
+                <table class="table table-bordered table-hover table-sm align-middle">
+                    <thead class="text-center">
+                        <tr>
+                            <th style="width: 32px">#</th>
+                            <th>Nama Kategori</th>
+                            <th style="width: 120px">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse ($kategoris as $kategori)
+                        <tr class="text-center">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $kategori->nama_kategori }}</td>
+
+                            <td>
+                                <a href="{{ route('admin.kategori.edit', $kategori->idkategori) }}"
+                                    class="btn btn-warning btn-sm">Edit</a>
+
+                                <form action="{{ route('admin.kategori.delete', $kategori->idkategori) }}"
+                                      method="POST"
+                                      style="display:inline-block;"
+                                      onsubmit="return confirm('Yakin ingin menghapus kategori ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                            <tr><td colspan="3" class="text-center text-muted">Belum ada data.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@endsection

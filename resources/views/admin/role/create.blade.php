@@ -1,42 +1,66 @@
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Tambah Role
+@extends('layouts.lte.main')
+
+@section('content')
+
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Create Role</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Master</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.role.index') }}">Role</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.role.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+<div class="app-content">
+<div class="container-fluid">
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Form Tambah Role</h3>
+        </div>
+
+        <form action="{{ route('admin.role.store') }}" method="POST">
             @csrf
-            {{-- Nama --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Nama Role</label>
-                <input type="text" name="nama_role"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
+
+            <div class="card-body">
+
+                <div class="form-group mb-3">
+                    <label>Nama Role</label>
+                    <input type="text" 
+                           name="nama_role" 
+                           class="form-control @error('nama_role') is-invalid @enderror"
+                           value="{{ old('nama_role') }}"
+                           placeholder="Masukkan nama role">
+
+                    @error('nama_role')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.role.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Simpan
-                    </button>
-                </div>
+            <div class="card-footer d-flex justify-content-end">
+                <a href="{{ route('admin.role.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
             </div>
-            {{-- Tombol --}}
-            
+
         </form>
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection

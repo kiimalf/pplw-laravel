@@ -1,78 +1,153 @@
-<x-app-layout>
-    <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-6">
-        <div class="p-6 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Tambah Pet
+@extends('layouts.lte.main')
+
+@section('content')
+
+{{-- HEADER --}}
+<div class="app-content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">Tambah Pet</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="#">Data Master</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.pet.index') }}">Pet</a></li>
+                    <li class="breadcrumb-item active">Create</li>
+                </ol>
+            </div>
         </div>
     </div>
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow rounded-xl">
-        <form action="{{ route('admin.pet.store') }}" method="POST" class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+</div>
 
+{{-- CONTENT --}}
+<div class="app-content">
+<div class="container-fluid">
+
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Form Tambah Pet</h3>
+        </div>
+
+        <form action="{{ route('admin.pet.store') }}" method="POST">
             @csrf
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Pemilik</label>
-                <select name="idpemilik" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="" selected disabled>Pilih Pemilik</option>
-                    @foreach ($pemilik as $item)
-                        <option value="{{ $item->idpemilik }}">{{ $item->user->nama }}</option>
-                    @endforeach
-                </select>
-            </div>
-            {{-- Nama --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Nama Pet</label>
-                <input type="text" name="nama_pet"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Tanggal Lahir</label>
-                <input type="date" name="tanggal_lahir"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Warna Tanda</label>
-                <input type="text" name="warna_tanda"
-                    class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Ras Hewan</label>
-                <select name="idras_hewan" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="" selected disabled>Pilih Ras Hewan</option>
-                    @foreach ($rasHewan as $item)
-                        <option value="{{ $item->idras_hewan }}">{{ $item->nama_ras }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700 dark:text-gray-200">Jenis Kelamin</label>
-                <select name="jenis_kelamin" class="w-full mt-1 px-4 py-2 border rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200" >
-                    <option value="" selected disabled>Pilih Jenis Kelamin</option>
-                    <option value="0">Jantan</option>
-                    <option value="1">Betina</option>
-                </select>
+
+            <div class="card-body">
+
+                {{-- PEMILIK --}}
+                <div class="form-group mb-3">
+                    <label for="idpemilik">Pemilik</label>
+                    <select name="idpemilik" id="select-pemilik" 
+                        class="form-control @error('idpemilik') is-invalid @enderror">
+                        <option value="" disabled selected>-- Cari dan pilih pemilik --</option>
+
+                        @foreach ($pemilik as $item)
+                            <option value="{{ $item->idpemilik }}">{{ $item->nama_pemilik }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('idpemilik')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        $('#select-pemilik').select2({
+                            placeholder: "Cari pemilik...",
+                            allowClear: true,
+                            width: "100%"
+                        });
+                    });
+                </script>
+
+
+                {{-- NAMA PET --}}
+                <div class="form-group mb-3">
+                    <label for="nama_pet">Nama Pet</label>
+                    <input type="text" 
+                           name="nama_pet" 
+                           class="form-control @error('nama_pet') is-invalid @enderror"
+                           value="{{ old('nama_pet') }}"
+                           placeholder="Masukkan Nama Pet">
+                    @error('nama_pet')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- TANGGAL LAHIR --}}
+                <div class="form-group mb-3">
+                    <label for="tanggal_lahir">Tanggal Lahir</label>
+                    <input type="date" 
+                           name="tanggal_lahir"
+                           class="form-control @error('tanggal_lahir') is-invalid @enderror"
+                           value="{{ old('tanggal_lahir') }}">
+                    @error('tanggal_lahir')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- WARNA TANDA --}}
+                <div class="form-group mb-3">
+                    <label for="warna_tanda">Warna atau Tanda</label>
+                    <input type="text" 
+                           name="warna_tanda"
+                           class="form-control @error('warna_tanda') is-invalid @enderror"
+                           value="{{ old('warna_tanda') }}"
+                           placeholder="Masukkan warna atau tanda pada hewan">
+                    @error('warna_tanda')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- RAS HEWAN --}}
+                <div class="form-group mb-3">
+                    <label for="idras_hewan">Ras Hewan</label>
+                    <select name="idras_hewan" class="form-control @error('idras_hewan') is-invalid @enderror">
+                        <option value="" disabled selected>-- Pilih Ras Hewan --</option>
+
+                        @foreach ($rasHewan as $item)
+                            <option value="{{ $item->idras_hewan }}">
+                                {{ $item->nama_ras }} ({{ $item->nama_jenis_hewan }})
+                            </option>
+                        @endforeach
+
+                    </select>
+                    @error('idras_hewan')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- JENIS KELAMIN --}}
+                <div class="form-group mb-3">
+                    <label for="jenis_kelamin">Jenis Kelamin</label>
+                    <select name="jenis_kelamin" 
+                            class="form-control @error('jenis_kelamin') is-invalid @enderror">
+                        <option value="" disabled selected>-- Pilih Jenis Kelamin --</option>
+                        <option value="0">Jantan</option>
+                        <option value="1">Betina</option>
+                    </select>
+                    @error('jenis_kelamin')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
             </div>
 
-            <div class="flex justify-between">
-                <div>
-                    @if ($errors->any())
-                        <div class="px-4 py-2 bg-red-200 text-red-800 rounded">
-                            <ul class="list-disc pl-5">
-                                @foreach ($errors->all() as $err)
-                                    <li>{{ $err }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                </div>
-                <div class="gap-2 sm:flex sm:items-center sm:ms-6">
-                    <a href="{{ route('admin.pet.index') }}"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg">Kembali</a>
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Simpan
-                    </button>
-                </div>
+            {{-- FOOTER --}}
+            <div class="card-footer d-flex justify-content-end gap-2">
+                <a href="{{ route('admin.pet.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan
+                </button>
             </div>
-            {{-- Tombol --}}
-            
+
         </form>
     </div>
-</x-app-layout>
+
+</div>
+</div>
+
+@endsection
